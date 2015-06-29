@@ -5,6 +5,7 @@ let ColorManipulator = require('./utils/color-manipulator');
 let Typography = require('./styles/typography');
 let EnhancedButton = require('./enhanced-button');
 let Paper = require('./paper');
+let FontIcon = require('./font-icon');
 
 
 function validateLabel (props, propName, componentName) {
@@ -39,6 +40,7 @@ let RaisedButton = React.createClass({
     labelColor: React.PropTypes.string,
     disabledBackgroundColor: React.PropTypes.string,
     disabledLabelColor: React.PropTypes.string,
+    iconClassName: React.PropTypes.string,
   },
 
   getInitialState() {
@@ -133,6 +135,15 @@ let RaisedButton = React.createClass({
       },
       overlayWhenHovered: {
         backgroundColor: ColorManipulator.fade(this._getLabelColor(), amount)
+      },
+      fontIconStyle: {
+        height: '100%',
+        display: 'inline-block',
+        verticalAlign: 'middle',
+        float: 'left',
+        paddingLeft: '12px',
+        lineHeight: '36px',
+        color: this._getLabelColor(),
       }
     };
     return styles;
@@ -150,11 +161,19 @@ let RaisedButton = React.createClass({
 
     let labelElement;
     if (label) {
+      let leftPaddingOnIcon = this.props.iconClassName ? {paddingLeft: '8px'} : {};
       labelElement = (
-        <span style={this.mergeAndPrefix(styles.label, this.props.labelStyle)}>
+        <span style={this.mergeAndPrefix(styles.label, leftPaddingOnIcon, this.props.labelStyle)}>
           {label}
         </span>
       );
+    }
+
+    let fontIconElement;
+    if (this.props.iconClassName) {
+      fontIconElement = <FontIcon
+          className={this.props.iconClassName}
+          style={styles.fontIconStyle}/>
     }
 
     let rippleColor = styles.label.color;
@@ -189,6 +208,7 @@ let RaisedButton = React.createClass({
                   (this.state.hovered && !this.props.disabled) && styles.overlayWhenHovered
                 )}>
                   {labelElement}
+                  {fontIconElement}
                   {this.props.children}
               </div>
           </EnhancedButton>
