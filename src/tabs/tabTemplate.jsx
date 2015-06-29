@@ -1,7 +1,10 @@
 let React = require('react');
+let StylePropable = require('../mixins/style-propable');
 
 
 let TabTemplate = React.createClass({
+
+  mixins: [StylePropable],
 
   render() {
     let styles = {
@@ -12,13 +15,18 @@ let TabTemplate = React.createClass({
       'textAlign': 'initial'
     };
 
+    let flexFromProp = this.props.style;
+
     if (this.props.selected) {
-      delete styles.height
-      delete styles.overflow
+      delete styles.height;
+      delete styles.overflow;
+    }
+    else {
+      flexFromProp = {};
     }
 
     return (
-      <div style={styles}>
+      <div style={this.mergeAndPrefix(styles, flexFromProp)}>
         {this.props.children}
       </div>
     );

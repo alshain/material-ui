@@ -19,6 +19,7 @@ let Tabs = React.createClass({
     tabWidth: React.PropTypes.number,
     tabItemContainerStyle: React.PropTypes.object,
     contentContainerStyle: React.PropTypes.object,
+    flexContent: React.PropTypes.bool,
   },
 
   getInitialState(){
@@ -64,6 +65,13 @@ let Tabs = React.createClass({
 
   getStyles() {
     let themeVariables = this.context.muiTheme.component.tabs;
+    let flexContent = this.props.flexContent;
+
+    let flexStyle = {
+      display: 'flex',
+      flex: '1',
+      flexDirection: 'column',
+    };
 
     return {
       tabItemContainer: {
@@ -74,8 +82,9 @@ let Tabs = React.createClass({
         backgroundColor: themeVariables.backgroundColor,
         whiteSpace: 'nowrap',
         display: 'table'
-      }
-    };
+      },
+      flexStyle: flexContent ? flexStyle : {},
+    }
   },
 
   render(){
@@ -93,7 +102,8 @@ let Tabs = React.createClass({
         if (tab.props.children) {
           tabContent.push(React.createElement(TabTemplate, {
             key: index,
-            selected: this.state.selectedIndex === index
+            selected: this.state.selectedIndex === index,
+            style: this.mergeAndPrefix(styles.flexStyle),
           }, tab.props.children));
         }
         else {
@@ -116,12 +126,12 @@ let Tabs = React.createClass({
     }, this);
 
     return (
-      <div style={this.mergeAndPrefix(this.props.style)}>
+      <div style={this.mergeAndPrefix(styles.flexStyle, this.props.style)}>
         <div style={this.mergeAndPrefix(styles.tabItemContainer, this.props.tabItemContainerStyle)}>
           {tabs}
         </div>
         <InkBar left={left} width={width} />
-        <div style={this.mergeAndPrefix(this.props.contentContainerStyle)}>
+        <div style={this.mergeAndPrefix(styles.flexStyle, this.props.contentContainerStyle)}>
           {tabContent}
         </div>
       </div>
