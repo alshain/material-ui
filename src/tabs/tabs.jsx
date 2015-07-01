@@ -28,7 +28,9 @@ let Tabs = React.createClass({
       selectedIndex = this.props.initialSelectedIndex;
     }
     return {
-      selectedIndex: selectedIndex
+      selectedIndex,
+      forceActivate: true,
+      previousKey: undefined,
     };
   },
 
@@ -49,16 +51,44 @@ let Tabs = React.createClass({
     Events.off(window, 'resize', this._updateTabWidth);
   },
 
-  componentWillReceiveProps(newProps) {
-    if (newProps.hasOwnProperty('style')) this._updateTabWidth();
+  componentDidUpdate() {
+    
   },
 
-  handleTouchTap(tabIndex, tab){
+  componentWillReceiveProps(newProps) {
+    if (newProps.hasOwnProperty('style')) this._updateTabWidth();
+    
+    if (newProps.children.length === 0) {
+      this.setState({selectedIndex: 0, previousKey: undefined, forceActivate: false});
+    }
+    else if (this.state.selectedIndex >= newProps.children.length) {
+      let selectedIndex = newProps.children.length - 1;
+      let forceActivate = true;
+      let previousKey = newProps.children[selectedIndex].key;
+      this.setState({selectedIndex, forceActivate, previousKey});
+    }
+    else if (this.state.previousKey !== newProps.children[this.state.selectedIndex].key) {
+      let forceActivate = true;
+      let previousKey = newProps.children[this.state.selectedIndex].key;
+      this.setState({forceActivate, previousKey});
+    }
+    else {
+      let forceActivate = false;
+      //let previousKey = this.props.children[this.state.selectedIndex].key;
+      this.setState({forceActivate});
+    }
+
+  },
+
+  handleTouchTap(tabIndex, tab, forceActivate){
     if (this.props.onChange && this.state.selectedIndex !== tabIndex) {
       this.props.onChange(tabIndex, tab);
     }
 
-    this.setState({selectedIndex: tabIndex});
+    if (forceActivate !== true) {
+      this.setState({selectedIndex: tabIndex});
+    }
+    
     //default CB is _onActive. Can be updated in tab.jsx
     if (tab.props.onActive) tab.props.onActive(tab);
   },
@@ -101,7 +131,7 @@ let Tabs = React.createClass({
       if (tab.type.displayName === "Tab") {
         if (tab.props.children) {
           tabContent.push(React.createElement(TabTemplate, {
-            key: index,
+            key: tab.key,
             selected: this.state.selectedIndex === index,
             style: this.mergeAndPrefix(styles.flexStyle),
           }, tab.props.children));
@@ -110,13 +140,15 @@ let Tabs = React.createClass({
           tabContent.push(undefined)
         }
 
-        return React.addons.cloneWithProps(tab, {
-          key: index,
+        let clone = React.cloneElement(tab, {
+          reactKey: tab.key,
           selected: this.state.selectedIndex === index,
           tabIndex: index,
           width: width,
-          handleTouchTap: this.handleTouchTap
+          handleTouchTap: this.handleTouchTap,
+          didForceActivate: this.state.forceActivate && index === this.state.selectedIndex,
         });
+        return clone;
       }
       else {
         let type = tab.type.displayName || tab.type;

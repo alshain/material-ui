@@ -28,7 +28,7 @@ let InkBar = React.createClass({
       height: 2,
       marginTop: -2,
       position: 'relative',
-      transition: Transitions.easeOut('1s', 'left')
+      transition: Transitions.easeOut('1s', ['left', 'width'])
     });
 
     return (

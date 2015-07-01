@@ -33,6 +33,7 @@ let ToolbarGroup = React.createClass({
   getStyles() {
     let marginHorizontal = this.getSpacing();
     let marginVertical = (this.getTheme().height - this.context.muiTheme.component.button.height) / 2;
+    let iconButtonVerticalMargin = (this.getTheme().height - this.context.muiTheme.component.button.iconButtonSize) / 2;
     let styles = {
       root: {
         position: 'relative',
@@ -55,8 +56,18 @@ let ToolbarGroup = React.createClass({
       },
       button: {
         float: 'left',
-        margin: marginVertical + 'px ' + marginHorizontal + 'px',
+        marginTop: marginVertical + 'px',
+        marginBottom: marginVertical + 'px',
+        marginLeft: 0,
+        marginRight: marginHorizontal + 'px',
         position: 'relative'
+      },
+      iconButton: {
+        float: 'left',
+        marginTop: iconButtonVerticalMargin + 'px',
+        marginBottom: iconButtonVerticalMargin + 'px',
+        marginLeft: 0,
+        marginRight: iconButtonVerticalMargin + 'px',
       },
       icon: {
         root: {
@@ -107,6 +118,10 @@ let ToolbarGroup = React.createClass({
           return React.cloneElement(currentChild, {
             style: this.mergeStyles(styles.button, currentChild.props.style),
           });
+        case 'IconButton' : 
+          return React.cloneElement(currentChild, {
+            style: this.mergeStyles(styles.iconButton, currentChild.props.style),
+          }); 
         case 'FontIcon' :
           return React.cloneElement(currentChild, {
             style: this.mergeStyles(styles.icon.root, currentChild.props.style),

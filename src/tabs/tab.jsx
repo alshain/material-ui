@@ -14,11 +14,28 @@ let Tab = React.createClass({
   propTypes: {
     handleTouchTap: React.PropTypes.func,
     selected: React.PropTypes.bool,
-    width: React.PropTypes.string
+    width: React.PropTypes.string,
+    touchTapOnForceActivate: React.PropTypes.bool,
+    onForceActivate: React.PropTypes.bool,
   },
 
-  handleTouchTap() {
-    this.props.handleTouchTap(this.props.tabIndex, this);
+  handleTouchTap(forceActivate) {
+    this.props.handleTouchTap(this.props.tabIndex, this, forceActivate);
+  },
+
+  componentDidUpdate() {
+    if (this.props.didForceActivate) {
+      if (this.props.onForceActivate && this.props.touchTapOnForceActivate) {
+        console.error("[mui.Tab] Cannot set both onForceActivate and touchTapOnForceActivate, touchTapOnForceActivate takes precedence");
+      }
+
+      if (this.props.touchTapOnForceActivate) {
+        this.handleTouchTap(true);
+      }
+      else if (this.props.onForceActivate) {
+        this.onForceActivate();
+      }
+    }
   },
 
   render() {
